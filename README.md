@@ -12,19 +12,21 @@ dd if=archlinux.img of=/dev/sdX bs=16M && sync disk
 diskutil list
 sudo umount /dev/disk2                         # again, choose the right path!
 dd if=archlinux.img of=/dev/rdisk2 bs=1m       # notice the path is /dev/**r**disk2 - this will transfer more quickly
-- you'll get a notification from macOS that "the disk format isn't recognized" - you may simply remove the drive and proceed
+- you'll get a notification from macOS like "the disk format isn't recognized" - no worries: simply remove the drive and proceed
 
-# Boot from the usb. If the usb fails to boot, make sure that secure boot is disabled in the BIOS configuration.
+#### Boot from the USB. 
+If the USB fails to boot, make sure that secure boot is disabled in the BIOS configuration.
 
-# Set swedish keymap
-loadkeys sv-latin1
+##### Set keymap:
+By default, the US keymap is loaded. Otherwise, consult the wiki to find your desired keyboard layout:
+`loadkeys sv-latin1`
 
-# This assumes a wifi only system...
-wifi-menu
+##### Connect to WiFi:
+`wifi-menu`
 
-# Create partitions
-cgdisk /dev/sdX
-1 100MB EFI partition # Hex code ef00
+# Create partitions:
+`cgdisk /dev/sdX` 
+1 512MB EFI partition # Hex code ef00
 2 250MB Boot partition # Hex code 8300
 3 100% size partiton # (to be encrypted) Hex code 8300
 
