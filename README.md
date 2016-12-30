@@ -136,7 +136,7 @@ mount /dev/sda1 /mnt/boot/efi
 `ILoveCandy`
 
 ##### Install the system and include stuff needed for connecting to WiFi when booting into the newly installed system:
-`pacstrap /mnt base base-devel btrfs-progs grub grub-efi-x86_64 sudo zsh zsh-completions vim git efibootmgr dialog wpa_supplicant grml-zsh-config xdg-user-dirs`
+`pacstrap /mnt base base-devel btrfs-progs grub grub-efi-x86_64 sudo zsh zsh-completions vim git efibootmgr dialog wpa_supplicant grml-zsh-config xdg-user-dirs wget`
 
 ##### Generate and edit `fstab`:
 
@@ -221,21 +221,117 @@ echo /dev/disk/by-uuid/<UUID> >> /etc/default/grub
 ```bash
 GRUB_CMDLINE_LINUX_DEFAULT="quiet transparent_hugepage=never"
 GRUB_CMDLINE_LINUX="cryptdevice=/dev/disk/by-uuid/<insert encrypted root UUID here>:lvm:allow-discards root=/dev/mapper/lvmvg-rootvol rootflags=subvol=root resume=/dev/mapper/lvmvg-swapvol"
-```
-grub-mkconfig -o /boot/grub/grub.cfg
 
-- Ignore any `lvmetad` warnings, they won't interfere with the `conf` generation
+# save, exit and:
+
+grub-mkconfig -o /boot/grub/grub.cfg
+```
+
+- Ignore any `lvmetad` warnings, they won't interfere with the `conf` setup
 
 ##### Drop out of the system:
 
-exit
+`exit`
 
 ##### Unmount all partitions:
 
-umount -R /mnt
-swapoff -a
+`umount -R /mnt`
+`swapoff -a`
 
 ##### Reboot into the new system - make sure to remove the USB:
-reboot
+`reboot`
 
-##### Rejoice and / or troubleshoot.
+##### Rejoice and / or troubleshoot :)
+
+##### System setup:
+
+- Login as `root`
+
+- Connect to WiFi with `wifi-menu`
+
+- Add normal user to sudoers:
+
+`visudo`
+Uncomment `username ALL=(ALL) ALL`
+
+- Populate `home` directory with familiar directories and prepare Builds directory:
+
+```bash
+cd ~
+xdg-user-dirs-update
+mv Public ./Builds
+```
+
+- Install Arch Build System:
+
+```bash
+cd ~/Builds
+pacman -S abs
+sudo abs
+```
+
+- Install Pacaur and dependencies:
+
+```bash
+pacman -S expect links
+links aur.archlinux.org
+
+# Navigate to 'aur' and look for falconindy's pinned comment:
+# Note: gpg occasionally gets messed up from recent updates, in which case you might find a patched version in [Testing].
+gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53
+
+# Hit 'Download Snapshot' and exit when the download finishes, then:
+tar -xzvf cower.tar.gz
+cd cower
+chmod +x PKGBUILD
+makepkg -i
+pacman -U cower
+cd ..
+
+# Now go grab pacaur from the AUR and do the same thing (make sure to gpg --recv-keys here as well)
+tar -xzvf pacaur.tar.gz
+cd pacaur
+chmod +x PKGBUILD
+makepkg -i
+```
+
+- Install and configure Xorg and Gnome:
+
+```bash
+pacman -S xf86-video-intel xorg-server xorg-xinit gnome 
+# (will also install gdm)
+
+
+# maintain authenticated session:
+vim ~/.xserverrc
+# add (note that the first line is not one of my comments, include it WITH the #):
+
+#!/bin/sh
+exec /usr/bin/Xorg -nolisten tcp "$@" vt$XDG_VTNR
+
+# Exit and:
+cp /etc/X11/xinit/xinitrc ~/.xinitrc
+vim ~/.xinitrc
+
+# Edit and add:
+
+if [ -d /etc/X11/xinit/xinitrc.d ] ; then
+    for f in /etc/X11/xinit/xinitrc.d/?*.sh ; do
+        [ -x "$f" ] && . "$f"
+    done
+    unset f
+fi
+
+# add this to the bottom of the file:
+exec gnome-session
+
+
+# start X at login:
+vim ~/.zprofile (or ~/.bash_profile if you prefer)
+# add:
+if [ -z "$DISPLAY" ] && [ -n "$XDG_VTNR" ] && [ "$XDG_VTNR" -eq 1 ]; then
+  exec startx
+fi
+```
+
+##### Deep breath and reboot again.
