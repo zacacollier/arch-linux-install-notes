@@ -1,11 +1,18 @@
-# arch-linux-install-notes
-Install guide for LVM on LUKS-encrypted Btrfs root
-# Install ARCH Linux with encrypted file-system and UEFI
-# The official installation guide (https://wiki.archlinux.org/index.php/Installation_Guide) contains a more verbose description.
+# Install Arch Linux with LVM on LUKS Btrfs root
+Drawing from [this](https://fogelholk.io/installing-arch-with-lvm-on-luks-and-btrfs/) nice guide.
+When in doubt, always consult the [wiki](https://wiki.archlinux.org/index.php/Installation_Guide).
 
-# Download the archiso image from https://www.archlinux.org/
-# Copy to a usb-drive
-dd if=archlinux.img of=/dev/sdX bs=16M && sync # on linux
+#### Download the image from https://www.archlinux.org/ and format a USB drive:
+
+##### on Linux:
+lsblk -f              # make sure you choose the right path!
+dd if=archlinux.img of=/dev/sdX bs=16M && sync disk
+
+##### on macOS:
+diskutil list
+sudo umount /dev/disk2                         # again, choose the right path!
+dd if=archlinux.img of=/dev/rdisk2 bs=1m       # notice the path is /dev/**r**disk2 - this will transfer more quickly
+- you'll get a notification from macOS that "the disk format isn't recognized" - you may simply remove the drive and proceed
 
 # Boot from the usb. If the usb fails to boot, make sure that secure boot is disabled in the BIOS configuration.
 
