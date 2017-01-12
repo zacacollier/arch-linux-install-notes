@@ -385,7 +385,11 @@ sudo snap-sync
 ```bash
 pacman -S neovim
 echo 'alias -g vim="neovim"' >> ~/.zshrc
+# copy to system clipboard by putting this in init.vim:
+        noremap <C-y> "+y
 ```
+
+
 #### Slightly hacky method to make Powerline fonts work:
 ##### Add to your `.zshrc`:
 export LC_ALL=en_US.UTF-8
