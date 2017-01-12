@@ -335,3 +335,46 @@ fi
 ```
 
 ##### Deep breath and reboot again.
+
+#### btrfs Backups to external USB with `snapper` and `snap-sync`
+
+##### Install snapper and create snapshot configs
+```bash
+pacman -S snapper
+snapper -c root create-config /
+snapper -c home create-config /home
+# You'll need to delete the automatically-generated subvolumes,
+# as they are [inherently flawed and shouldn't be relied upon](https://bbs.archlinux.org/viewtopic.php?id=194491)
+btrfs subvolume delete /.snapshots
+btrfs subvolume delete /home/.snapshots
+# Now, create new subvolumes and mount them at the mountpoints snapper expects:
+mkdir /snapshots
+mkdir /.snapshots
+mkdir /home/.snapshots
+btrfs subvolume create /snapshots/root_snaps
+btrfs subvolume create /snapshots/home_snaps
+# Lookup subvolume ID for root_snaps and home_snaps,
+# and mount them to their respective snapshot mountpoints
+btrfs subvolume list -a /
+mount -o compress=lzo,subvolid=<ROOT_SNAPS_ID> /dev/mapper/lvmvg-root /.snapshots
+mount -o compress=lzo,subvolid=<HOME_SNAPS_ID> /dev/mapper/lvmvg-root /home/.snapshots
+# Enable automatic snapshots
+systemctl start snapper-timeline.timer snapper-cleanup.timer
+systemctl enable snapper-timeline.timer snapper-cleanup.timer
+```
+
+##### Install `snap-sync` and backup to btrfs-formatted USB volume
+
+```bash
+mkfs.btrfs -L Backups /dev/sdbX
+mount -o compress=lzo /dev/sdbX /mnt
+pacaur -S snap-sync
+sudo snap-sync
+# Follow the directions to backup to the USB.
+# It's possible you might have to create a 'Backups' directory at /mnt
+# (I did for some reason, but can't remember why -.-')
+```
+
+#### Slightly hacky method to make Powerline fonts work:
+##### Add to your `.zshrc`:
+export LC_ALL=en_US.UTF-8
