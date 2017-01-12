@@ -9,10 +9,12 @@ lsblk -f              # make sure you choose the right path!
 dd if=archlinux.img of=/dev/sdX bs=16M && sync disk
 
 ##### on macOS:
+```bash
 `diskutil list`
 `sudo umount /dev/disk2`                         # again, choose the right path!
 `dd if=archlinux.img of=/dev/rdisk2 bs=1m`       # notice the path is /dev/**r**disk2 - this will transfer more quickly
-- you'll get a notification from macOS like "the disk format isn't recognized" - no worries: simply remove the drive and proceed
+# you'll get a notification from macOS like "the disk format isn't recognized" - no worries: simply remove the drive and proceed
+```
 
 #### Boot from the USB. 
 If the USB fails to boot, make sure that secure boot is disabled in the BIOS configuration.
@@ -344,7 +346,7 @@ pacman -S snapper
 snapper -c root create-config /
 snapper -c home create-config /home
 # You'll need to delete the automatically-generated subvolumes,
-# as they are [inherently flawed and shouldn't be relied upon](https://bbs.archlinux.org/viewtopic.php?id=194491)
+# as they are inherently flawed and shouldn't be relied upon (See [1])
 btrfs subvolume delete /.snapshots
 btrfs subvolume delete /home/.snapshots
 # Now, create new subvolumes and mount them at the mountpoints snapper expects:
@@ -362,6 +364,7 @@ mount -o compress=lzo,subvolid=<HOME_SNAPS_ID> /dev/mapper/lvmvg-root /home/.sna
 systemctl start snapper-timeline.timer snapper-cleanup.timer
 systemctl enable snapper-timeline.timer snapper-cleanup.timer
 ```
+[1](https://bbs.archlinux.org/viewtopic.php?id=194491)
 
 ##### Install `snap-sync` and backup to btrfs-formatted USB volume
 
@@ -375,6 +378,14 @@ sudo snap-sync
 # (I did for some reason, but can't remember why -.-')
 ```
 
+#### Add pacman / pacaur alias to `.zshrc`
+`echo 'alias -g pac="pacaur"' >> ~/.zshrc`
+
+#### Install neovim
+```bash
+pacman -S neovim
+echo 'alias -g vim="neovim"' >> ~/.zshrc
+```
 #### Slightly hacky method to make Powerline fonts work:
 ##### Add to your `.zshrc`:
 export LC_ALL=en_US.UTF-8
