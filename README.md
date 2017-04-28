@@ -392,4 +392,30 @@ echo 'alias -g vim="neovim"' >> ~/.zshrc
 
 #### Slightly hacky method to make Powerline fonts work:
 ##### Add to your `.zshrc`:
-export LC_ALL=en_US.UTF-8
+`export LC_ALL=en_US.UTF-8`
+
+#### Better method:
+Edit `/etc/locale.conf`
+
+
+#### Remap Caps Lock to Control, Control to Escape (Macbook 12,1)
+
+```
+~/.Xmodmap
+clear lock
+clear control
+keycode 66 = Control_L
+add control = Control_L
+keycode 37 = Escape NoSymbol Escape
+```
+
+#### Also ensure that you're prepending the `.Xmodmap` conditional check:
+
+```~/.xinitrc
+setxkbmap -option apple:badmap
+
+if [ -f $HOME/.Xmodmap ]; then
+    /usr/bin/xmodmap $HOME/.Xmodmap
+fi
+```
+Otherwise it'll swallow your "<" / ">" keycodes
