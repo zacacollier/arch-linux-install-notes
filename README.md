@@ -280,7 +280,9 @@ pacman -S abs
 sudo abs
 ```
 
-- Install Pacaur and dependencies:
+- Install `pacaur` and dependencies:
+
+> Don't do this as root.
 
 ```bash
 pacman -S expect links
