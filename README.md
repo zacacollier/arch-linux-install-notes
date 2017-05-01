@@ -174,7 +174,7 @@ hwclock --systohc --utc
 ```bash
 echo LANG=en_US.UTF-8 >> /etc/locale.conf
 echo LANGUAGE=en_US >> /etc/locale.conf
-echo LC_ALL=C >> /etc/locale.conf
+echo LC_ALL=en_US.UTF-8 >> /etc/locale.conf
 ```
 
 ##### Set password for root:
@@ -210,11 +210,19 @@ HOOKS="base udev autodetect modconf block encrypt lvm2 btrfs resume filesystems 
 
 `grub-install`
 
-- Find persistent UUID pathname for root partition:
-
+- Find the persistent UUID pathname for your root partition:
+> The *encrypted* LVM you made, not the `btrfs` subvolume:
+```bash
+NAME          FSTYPE      LABEL              UUID                                   
+sda                                                                                 
+├─sda1        vfat                           294C-3908                              
+├─sda2        ext4                           3d02045e-aa03-4cb5-9503-7eea54bdedc8   
+└─sda3        crypto_LUKS                    d362beea-62e8-41de-90a6-eab3c70f2ce0   <--- this
+```
+Use `blkid` to find it:
 ```bash
 blkid
-(find your partition's uuid)
+(find your encrypted root partition's uuid)
 echo /dev/disk/by-uuid/<UUID> >> /etc/default/grub
 ```
 
