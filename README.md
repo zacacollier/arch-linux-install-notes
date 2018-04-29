@@ -23,6 +23,10 @@ If the USB fails to boot, make sure that secure boot is disabled in the BIOS con
 By default, the US keymap is loaded. Otherwise, consult the wiki to find your desired keyboard layout:
 `loadkeys sv-latin1`
 
+##### Update the system clock:
+`# timedatectl set-ntp true`
+Verify with `timedatectl status`.
+
 ##### Connect to WiFi:
 `wifi-menu`
 
@@ -272,41 +276,6 @@ xdg-user-dirs-update
 mv Public ./Builds
 ```
 
-- Install Arch Build System:
-
-```bash
-cd ~/Builds
-pacman -S abs
-sudo abs
-```
-
-- Install `pacaur` and dependencies:
-
-> Don't do this as root.
-
-```bash
-pacman -S expect links
-links aur.archlinux.org
-
-# Navigate to 'aur' and look for falconindy's pinned comment:
-# Note: gpg occasionally gets messed up from recent updates, in which case you might find a patched version in [Testing].
-gpg --recv-keys --keyserver hkp://pgp.mit.edu 1EB2638FF56C0C53
-
-# Hit 'Download Snapshot' and exit when the download finishes, then:
-tar -xzvf cower.tar.gz
-cd cower
-chmod +x PKGBUILD
-makepkg -i
-pacman -U cower
-cd ..
-
-# Now go grab pacaur from the AUR and do the same thing (make sure to gpg --recv-keys here as well)
-tar -xzvf pacaur.tar.gz
-cd pacaur
-chmod +x PKGBUILD
-makepkg -i
-```
-
 - Install and configure Xorg and Gnome:
 
 ```bash
@@ -347,6 +316,12 @@ fi
 ```
 
 ##### Deep breath and reboot again.
+
+Assuming all goes well, you should be ready to start setting up your userland. I usually enable `gdm` and `NetworkManager` to get the ball rolling, then install Chrome from the AUR, etc.
+
+##### btrfs issues
+`INFO: task btrfs-tranacti:191 blocked for more than 120 seconds.`
+See [this forum topic](https://bbs.archlinux.org/viewtopic.php?id=221479) for info. Also try clearing out `~/.cache`.
 
 #### btrfs Backups to external USB with `snapper` and `snap-sync`
 
